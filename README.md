@@ -29,11 +29,13 @@ chmod +x ~/.local/bin/tulikieli
 
 # Run initial setup
 ~/.local/bin/liekinvartija.py setup
+```
 
-# Usage
+## Usage
 
-## Store credentials
+### Store Credentials
 
+```bash
 # Store API keys
 tulikieli add porkbun api_key "your_api_key_here"
 tulikieli add porkbun secret_key "your_secret_key_here"
@@ -44,9 +46,11 @@ tulikieli add passwords server_liekki "your_server_password"
 
 # Store secure notes
 tulikieli add secure_notes recovery "ABCD-1234-EFGH-5678"
+```
 
-# Retrieve credentials
+### Retrieve Credentials
 
+```bash
 # Get a specific credential
 tulikieli get porkbun api_key
 
@@ -58,16 +62,20 @@ API_KEY=$(tulikieli get porkbun api_key)
 
 # List available services
 tulikieli list
+```
 
-# Security Features
+## Security Features
 
-GPG Encryption - All credentials are stored in an encrypted file
-No Passphrase Required - Uses a dedicated GPG key for seamless script integration
-Protected at Rest - Data is encrypted on disk, safe from accidental exposure
-Permission Controls - Configuration directory uses restricted permissions
+- **GPG Encryption** - All credentials are stored in an encrypted file
+- **No Passphrase Required** - Uses a dedicated GPG key for seamless script integration
+- **Protected at Rest** - Data is encrypted on disk, safe from accidental exposure
+- **Permission Controls** - Configuration directory uses restricted permissions
 
-# To allow root access to same credentials
+## Root Access Configuration
 
+To allow root access to the same credentials:
+
+```bash
 # Export your Tulenvartija key
 gpg --export-secret-keys --armor "Tulenvartija" > /tmp/tulen_key.asc
 
@@ -79,16 +87,21 @@ echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "Tulenvartija" trust
 # Clean up
 exit  # Exit from root shell
 shred -u /tmp/tulen_key.asc
+```
 
-# Backup and recovery
-Always back up your GPG key
+## Backup and Recovery
 
+Always back up your GPG key:
+
+```bash
 # Export the key (include both private and public parts)
 gpg --export-secret-keys --armor "Tulenvartija" > ~/tulenvartija_backup_key.asc
+```
 
-# Store this file securely! You will need it to recover your credentials.
+**Important**: Store this file securely! You will need it to recover your credentials.
 
-# Licence 
+## License
+
 MIT
 
 
