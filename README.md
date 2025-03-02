@@ -8,7 +8,7 @@ Tulenkantajat provides a secure way to store and retrieve sensitive information 
 
 ## Components
 
-* **Liekkivartija** ("Flame Guardian") - The core Python script that handles encryption, decryption, and credential management
+* **Liekinvartija** ("Flame Guardian") - The core Python script that handles encryption, decryption, and credential management
 * **Tulikieli** ("Fire Language") - A shell wrapper for convenient command-line access
 * **Tulisija** ("Fireplace") - The configuration directory where credentials are stored
 * **Kipinä** ("Spark") - The encrypted storage file
@@ -20,15 +20,15 @@ Tulenkantajat provides a secure way to store and retrieve sensitive information 
 mkdir -p ~/.local/bin ~/.config/tulisija
 
 # Install the Python script
-cp src/liekkivartija.py ~/.local/bin/
-chmod +x ~/.local/bin/liekkivartija.py
+cp src/liekinvartija.py ~/.local/bin/
+chmod +x ~/.local/bin/liekinvartija.py
 
 # Install the shell wrapper
 cp src/tulikieli ~/.local/bin/
 chmod +x ~/.local/bin/tulikieli
 
 # Run initial setup
-~/.local/bin/liekkivartija.py setup
+~/.local/bin/liekinvartija.py setup
 
 # Usage
 

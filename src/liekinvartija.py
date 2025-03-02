@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# liekkivartija.py - Secure credential manager
+# liekinvartija.py - Secure credential manager
 
 import os
 import sys
@@ -143,7 +143,7 @@ Key-Type: RSA
 Key-Length: 3072
 Key-Usage: encrypt,sign
 Name-Real: {KEY_NAME}
-Name-Email: liekkivartija@liekki.xyz
+Name-Email: liekinvartija@liekki.xyz
 Expire-Date: 0
 %commit
 """
@@ -222,7 +222,7 @@ def add_credential(service, key, value):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Liekkivartija - Secure credential manager for liekki.xyz",
+        description="Liekinvartija - Secure credential manager for liekki.xyz",
         epilog="Part of the Tulenkantajat suite for secure data management"
     )
     
@@ -291,8 +291,8 @@ if __name__ == "__main__":
         ensure_directories()
         key_id = setup_key()
         if key_id:
-            print(f"Liekkivartija setup complete. Your secure storage is at {KIPINA_FILE}")
-            print("You can now add credentials with 'liekkivartija.py add service key value'")
+            print(f"Liekinvartija setup complete. Your secure storage is at {KIPINA_FILE}")
+            print("You can now add credentials with 'liekinvartija.py add service key value'")
         else:
             sys.stderr.write("Setup failed\n")
             sys.exit(1)

@@ -2,7 +2,7 @@
 # tulikieli.sh - Command-line interface for Liekkivartija credential manager
 
 # Path to the Python script
-LIEKKIVARTIJA="$HOME/.local/bin/liekkivartija.py"
+LIEKKIVARTIJA="$HOME/.local/bin/liekinvartija.py"
 
 # Check if Python script exists
 if [ ! -f "$LIEKKIVARTIJA" ]; then
