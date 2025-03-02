@@ -1,12 +1,12 @@
 #!/bin/bash
-# tulikieli.sh - Command-line interface for Liekkivartija credential manager
+# tulikieli.sh - Command-line interface for Liekinvartija credential manager
 
 # Path to the Python script
 LIEKINVARTIJA="$HOME/.local/bin/liekinvartija.py"
 
 # Check if Python script exists
 if [ ! -f "$LIEKINVARTIJA" ]; then
-    echo "Error: Liekkivartija not found at $LIEKINVARTIJA" >&2
+    echo "Error: Liekinvartija not found at $LIEKINVARTIJA" >&2
     echo "Please ensure it's installed correctly" >&2
     exit 1
 fi

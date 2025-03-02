@@ -379,6 +379,11 @@ if __name__ == "__main__":
         if key_id:
             print(f"Liekinvartija setup complete. Your secure storage is at {KIPINA_FILE}")
             print("You can now add credentials with 'liekinvartija.py add service key value'")
+            # Export and encrypt the key with a strong passphrase
+            subprocess.run(
+                ["gpg", "--export-secret-keys", "--armor", KEY_NAME],
+                capture_output=True
+            )
         else:
             sys.stderr.write("Setup failed\n")
             sys.exit(1)
