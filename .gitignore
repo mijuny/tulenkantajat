@@ -1,0 +1,23 @@
+# Compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test files
+test_*.py
+
+# Credentials and keys
+*.gpg
+*.asc
+*key*
+
+# Local environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# System files
+.DS_Store
+Thumbs.db
