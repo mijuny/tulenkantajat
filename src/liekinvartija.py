@@ -220,6 +220,84 @@ def add_credential(service, key, value):
     os.unlink(temp_file)
     return True
 
+def print_key_info():
+    """Print information about the current encryption key"""
+    key_id = get_key_id()
+    if not key_id:
+        sys.stderr.write(f"No key found for '{KEY_NAME}'\n")
+        return False
+        
+    result = subprocess.run(
+        ["gpg", "--list-keys", key_id],
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode == 0:
+        print(result.stdout)
+        return True
+    return False
+
+def delete_credential(service, key=None):
+    """
+    Delete a credential or entire service.
+    
+    Args:
+        service: The service name to delete from
+        key: The specific key to delete, or None to delete entire service
+        
+    Returns:
+        bool: True if deletion was successful, False otherwise
+    """
+    content = decrypt_kipina()
+    if not content:
+        return False
+        
+    config = configparser.ConfigParser()
+    config.read_string(content)
+    
+    if service not in config:
+        sys.stderr.write(f"Service '{service}' not found\n")
+        return False
+    
+    if key is not None:
+        if key not in config[service]:
+            sys.stderr.write(f"Key '{key}' not found in service '{service}'\n")
+            return False
+        del config[service][key]
+        # Remove the service if it's empty
+        if not config[service]:
+            del config[service]
+    else:
+        # Delete entire service
+        del config[service]
+    
+    # Write to temporary file
+    temp_file = os.path.join(TULISIJA_DIR, "temp.txt")
+    with open(temp_file, 'w') as f:
+        config.write(f)
+    
+    # Encrypt and replace original
+    key_id = get_key_id()
+    if not key_id:
+        sys.stderr.write(f"Error: Could not find GPG key '{KEY_NAME}'\n")
+        os.unlink(temp_file)
+        return False
+    
+    result = subprocess.run(
+        ["gpg", "--recipient", key_id, "--encrypt", temp_file],
+        capture_output=True
+    )
+    
+    if result.returncode != 0:
+        sys.stderr.write(f"Error encrypting: {result.stderr.decode('utf-8')}\n")
+        os.unlink(temp_file)
+        return False
+    
+    shutil.move(f"{temp_file}.gpg", KIPINA_FILE)
+    os.unlink(temp_file)
+    return True
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Liekinvartija - Secure credential manager for liekki.xyz",
@@ -244,6 +322,14 @@ if __name__ == "__main__":
     
     # Setup command
     setup_parser = subparsers.add_parser("setup", help="Set up initial configuration")
+    
+    # Add new key-info command
+    key_parser = subparsers.add_parser("key-info", help="Show encryption key information")
+    
+    # Add delete command
+    delete_parser = subparsers.add_parser("delete", help="Delete a credential or service")
+    delete_parser.add_argument("service", help="Service name")
+    delete_parser.add_argument("key", nargs="?", help="Credential key (omit to delete entire service)")
     
     args = parser.parse_args()
     
@@ -295,6 +381,19 @@ if __name__ == "__main__":
             print("You can now add credentials with 'liekinvartija.py add service key value'")
         else:
             sys.stderr.write("Setup failed\n")
+            sys.exit(1)
+            
+    elif args.command == "key-info":
+        if not print_key_info():
+            sys.exit(1)
+            
+    elif args.command == "delete":
+        if delete_credential(args.service, args.key):
+            if args.key:
+                print(f"Deleted credential {args.service}.{args.key}")
+            else:
+                print(f"Deleted service {args.service} and all its credentials")
+        else:
             sys.exit(1)
             
     else:
