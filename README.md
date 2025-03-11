@@ -1,6 +1,6 @@
 # Tulenkantajat - Secure Credentials Manager
 
-A secure, GPG-based credentials management system named after the Finnish literary movement "Tulenkantajat" (Fire Bearers).
+A secure, GPG-based credentials management system named after the Finnish literary movement "Tulenkantajat" (The Flame Bearers).
 
 ## Overview
 
