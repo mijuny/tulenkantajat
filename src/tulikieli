@@ -1,15 +1,88 @@
 #!/bin/bash
-# tulikieli.sh - Command-line interface for Liekinvartija credential manager
+# tulikieli - backward-compat shim over Proton Pass (pass-cli)
+#
+# Migrated 2026-05-26: kipina.gpg + Tulenvartija GPG key retired in favour
+# of Proton Pass items titled `tulikieli/<service>/<key>` in the Personal
+# vault. See ~/projects/tulenkantajat/README.md for migration notes.
+#
+# The reading half (`get`, `list`) is preserved so existing consumer
+# scripts keep working without modification. Writes (`add`, `delete`)
+# print a deprecation message; use pass-cli directly for those.
 
-# Path to the Python script
-LIEKINVARTIJA="$HOME/.local/bin/liekinvartija.py"
+VAULT="Personal"
+PREFIX="tulikieli/"
 
-# Check if Python script exists
-if [ ! -f "$LIEKINVARTIJA" ]; then
-    echo "Error: Liekinvartija not found at $LIEKINVARTIJA" >&2
-    echo "Please ensure it's installed correctly" >&2
+case "$1" in
+  get)
+    service="$2"
+    key="$3"
+    if [ -z "$service" ]; then
+      echo "Usage: tulikieli get <service> [key]" >&2
+      exit 2
+    fi
+    if [ -z "$key" ]; then
+      # tulikieli get <service> -> list keys for that service
+      pass-cli item list "$VAULT" --output json | \
+        jq -r --arg p "${PREFIX}${service}/" \
+          '.items[] | select(.title | startswith($p)) | .title | sub($p; "")'
+    else
+      # tulikieli get <service> <key> -> return value via stdout
+      pass-cli item view --vault-name "$VAULT" \
+        --item-title "${PREFIX}${service}/${key}" --field password
+    fi
+    ;;
+
+  list)
+    # tulikieli list -> list all migrated services
+    pass-cli item list "$VAULT" --output json | \
+      jq -r --arg p "$PREFIX" \
+        '.items[] | select(.title | startswith($p)) | .title | sub($p; "") | split("/")[0]' \
+      | sort -u
+    ;;
+
+  add|delete)
+    cat >&2 <<EOF
+tulikieli is now a read-only shim over Proton Pass (migrated 2026-05-26).
+Use pass-cli directly for writes:
+
+  Add a new entry:
+    read -rs VALUE && echo                  # silent input
+    printf '%s' "\$VALUE" | jq -Rs \\
+      '{title:"tulikieli/<service>/<key>", password:.}' \\
+      | pass-cli item create login --vault-name $VAULT --from-template -
+    unset VALUE
+
+  Delete:
+    pass-cli item delete --vault-name $VAULT \\
+      --item-title 'tulikieli/<service>/<key>'
+
+See ~/.claude/skills/proton-pass for full patterns.
+EOF
     exit 1
-fi
+    ;;
 
-# Pass all arguments to the Python script
-"$LIEKINVARTIJA" "$@"
+  ""|-h|--help|help)
+    cat <<EOF
+tulikieli - read-only compat shim over Proton Pass (migrated 2026-05-26)
+
+  tulikieli get <service> [key]    Retrieve credential or list keys
+  tulikieli list                    List all migrated services
+
+All secrets are now Proton Pass items titled 'tulikieli/<service>/<key>'
+in the Personal vault, decryption gated by the YubiKey-protected Proton
+account.
+
+For writes (add, delete), use pass-cli directly; see the error message
+when running 'tulikieli add' for the canonical pattern.
+
+Original Tulenkantajat suite (liekinvartija.py + kipina.gpg + Tulenvartija
+GPG key) retired 2026-05-26. See ~/projects/tulenkantajat/README.md.
+EOF
+    ;;
+
+  *)
+    echo "Unknown command: $1" >&2
+    echo "Run 'tulikieli help' for usage." >&2
+    exit 2
+    ;;
+esac
